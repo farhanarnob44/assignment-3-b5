@@ -4,6 +4,6 @@ export interface IBook {
   genre: String,
   isbn: String,
   description: String,
-  copies: String,
-  available: boolean
+  copies: Number,
+  available: boolean,
 }
