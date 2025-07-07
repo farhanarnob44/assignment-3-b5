@@ -8,7 +8,7 @@ const bookSchema = new Schema<IBook>({
   genre: {type : String, required: true , trim: true, uppercase: true},
   isbn: {type: String , required: true},
   description: {type : String, required: true , trim: true},
-  copies: { type: Number },
+  copies: { type: Number , min: 0},
   available: {type: Boolean,required: true }
 },
 {
