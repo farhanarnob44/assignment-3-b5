@@ -3,6 +3,8 @@ import { Book } from "../models/book.model";
 import { Borrow } from "../models/borrow.model";
 export const bookRoutes = express.Router();
 
+
+
 // create a book
 
 bookRoutes.post("/books/create-book", async (req: Request, res: Response) => {
@@ -15,7 +17,7 @@ bookRoutes.post("/books/create-book", async (req: Request, res: Response) => {
       message: "Books created successfully",
       book,
     });
-  } catch (error: any) {
+  } catch (error ) {
     res.status(400).json({
       message: "Validation failed",
       success: false,
@@ -26,23 +28,75 @@ bookRoutes.post("/books/create-book", async (req: Request, res: Response) => {
 
 // get all books
 
-bookRoutes.get("/books/", async (req: Request, res: Response) => {
+// bookRoutes.get("/books/", async (req: Request, res: Response) => {
+//   try {
+//     const bookFilter =
+//       typeof req.query.filter === "string"
+//         ? req.query.filter.toUpperCase()
+//         : undefined;
+
+//     const query  = {};
+//     // if (bookFilter) {
+//     //   console.log(query)
+//     //   query.genre = bookFilter;
+//     // }
+
+//     const {genre,  sortBy, sort, limit } = req.query;
+
+//     const findQuery  = {};
+//     const sortOptions: { [key: string]: 1 | -1 } = {};
+//     let limitValue: number = 10;
+
+  
+  
+//     // const genre = req.query.filter
+//     // console.log(genre)
+//     // 1. Genre Filter
+
+    
+//     if (typeof genre === "string") {
+//       findQuery.genre = genre.toUpperCase();
+//     }
+
+//     // 2. Sorting
+//     const actualSortBy = typeof sortBy === "string" ? sortBy : "createdAt";
+//     sortOptions[actualSortBy] =
+//       sort === "desc" || sort === "descending" ? -1 : 1;
+
+//     // 3. Limiting results
+//     if (typeof limit === "string") {
+//       const parsedLimit = parseInt(limit, 10);
+//       if (!isNaN(parsedLimit) && parsedLimit > 0) {
+//         limitValue = parsedLimit;
+//       }
+//     }
+
+//     const books = await Book.find(query)
+//       .find(findQuery)
+//       .sort(sortOptions)
+//       .limit(limitValue);
+
+//     res.status(201).json({
+//       success: true,
+//       message: "all books get successfully",
+//       books,
+//     });
+//   } catch (error ) {
+//     res.status(400).json({
+//       message: "Validation failed",
+//       success: false,
+//       error: error,
+//     });
+//   }
+// });
+
+bookRoutes.get("/books", async (req: Request, res: Response): Promise<void> => {
   try {
-    const bookFilter =
-      typeof req.query.filter === "string"
-        ? req.query.filter.toUpperCase()
-        : undefined;
-
-    const query: any = {};
-    if (bookFilter) {
-      query.genre = bookFilter;
-    }
-
     const { genre, sortBy, sort, limit } = req.query;
 
-    const findQuery: any = {};
+    const findQuery: { [key: string]: any } = {};
     const sortOptions: { [key: string]: 1 | -1 } = {};
-    let limitValue: number = 10;
+    let limitValue = 10;
 
     // 1. Genre Filter
     if (typeof genre === "string") {
@@ -62,24 +116,24 @@ bookRoutes.get("/books/", async (req: Request, res: Response) => {
       }
     }
 
-    const books = await Book.find(query)
-      .find(findQuery)
+    const books = await Book.find(findQuery)
       .sort(sortOptions)
       .limit(limitValue);
 
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: "all books get successfully",
+      message: "Books fetched successfully",
       books,
     });
-  } catch (error: any) {
+  } catch (error) {
     res.status(400).json({
-      message: "Validation failed",
       success: false,
-      error: error,
+      message: "Validation failed",
+      error,
     });
   }
 });
+
 
 // get a single book
 
@@ -93,7 +147,7 @@ bookRoutes.get("/books/:bookId", async (req: Request, res: Response) => {
       message: "Book retrieved successfully",
       book,
     });
-  } catch (error: any) {
+  } catch (error ) {
     res.status(400).json({
       message: "Validation failed",
       success: false,
@@ -108,7 +162,7 @@ bookRoutes.put("/books/:bookId", async (req: Request, res: Response) => {
   try {
     const updatedBody = req.body;
     const bookId = req.params.bookId;
-    console.log(bookId)
+    // console.log(bookId)
     const updatedBook = await Book.findByIdAndUpdate(bookId, updatedBody, {
       new: true,
       runValidators: true,
@@ -119,7 +173,7 @@ bookRoutes.put("/books/:bookId", async (req: Request, res: Response) => {
       message: "Book updated successfully",
       data: updatedBook,
     });
-  } catch (error: any) {
+  } catch (error ) {
     res.status(400).json({
       message: "Validation failed",
       success: false,
@@ -132,7 +186,7 @@ bookRoutes.put("/books/:bookId", async (req: Request, res: Response) => {
 
 bookRoutes.delete("/books/:bookId", async (req: Request, res: Response) => {
   try {
-    const bookId = req.params.userId;
+    const bookId = req.params.bookId;
     const deleteBook = await Book.findByIdAndDelete(bookId);
 
     res.status(201).json({
@@ -140,7 +194,7 @@ bookRoutes.delete("/books/:bookId", async (req: Request, res: Response) => {
       message: "Book deleted successfully",
       data: deleteBook,
     });
-  } catch (error: any) {
+  } catch (error ) {
     res.status(400).json({
       message: "Validation failed",
       success: false,
@@ -151,74 +205,145 @@ bookRoutes.delete("/books/:bookId", async (req: Request, res: Response) => {
 
 // borrow books
 
-bookRoutes.post("/borrow/", async (req: Request, res: Response) => {
- 
+bookRoutes.post("/borrow/", async (req: Request, res: Response): Promise<void> =>{
 
-  try {
-    const { book: bookId, quantity, dueDate } = req.body;
+    try {
+    // const { book: bookId, quantity, dueDate } = req.body;
 
-    if (!bookId || !quantity || !dueDate) {
-        console.log(Error)
-      return (Error)
-    }
-    if (typeof quantity !== "number" || quantity <= 0) {
-      return res.status(400).json({
-        success: false,
-        message: "Quantity must be a positive number.",
-      });
-    }
-    const parsedDueDate = new Date(dueDate);
-    if (isNaN(parsedDueDate.getTime())) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Invalid dueDate format. Please provide a valid date string (e.g., ISO 8601).",
-      });
-    }
 
-    const book = await Book.findById(bookId);
+    // if (typeof quantity !== "number" || quantity <= 0) {
+    //    res.status(400).json({
+    //     success: false,
+    //     message: "Quantity must be a positive number.",
+    //   });
+    // }
+    // const parsedDueDate = new Date(dueDate);
+    // if (isNaN(parsedDueDate.getTime())) {
+    //    res.status(400).json({
+    //     success: false,
+    //     message:
+    //       "Invalid dueDate format. Please provide a valid date string.",
+    //   });
+    // }
 
-    if (!book) {
-      return res.status(404).json({
-        success: false,
-        message: "Book not found.",
-      });
-    }
-    console.log(book.copies);
+    // const book = await Book.findById(bookId);
 
-    let currentCopies = parseInt(book.copies as any);
-    if (currentCopies < quantity) {
-      return res.status(409).json({
-        success: false,
-        message:
-          "Not enough copies available for this book to fulfill the request.",
-      });
-    }
+    // if (!book) {
+    //    res.status(404).json({
+    //     success: false,
+    //     message: "Book not found.",
+    //   });
+    // }
+    // // console.log(book.copies);
 
-    currentCopies -= quantity;
-    book.available = currentCopies > 0;
+    // let currentCopies = book.copies;
+    // if (currentCopies < quantity) {
+    //    res.status(409).json({
+    //     success: false,
+    //     message:
+    //       "Not enough copies available for this book to fulfill the request.",
+    //   });
+    // }
 
-    await book.save();
+    // currentCopies -= quantity;
+    // book.available = currentCopies > 0;
 
-    const borrowRecord = await Borrow.create({
-      book: book._id,
-      quantity,
-      dueDate: parsedDueDate,
-    });
+    // await book.save();
+
+    // const borrowRecord = await Borrow.create({
+    //   book: book._id,
+    //   quantity,
+    //   dueDate: parsedDueDate,
+    // });
+
+      const { book, quantity, dueDate } = req.body;
+      const foundBook = await Book.findById(book);
+      if (!foundBook) {
+        res.status(404).json({
+          success: false,
+          message: "Book not found!",
+        });
+        return;
+      }
+      // await foundBook.borrowBook(quantity);
+      const data = await Borrow.create({ book, quantity, dueDate });
 
     res.status(201).json({
       success: true,
       message: "Book borrowed successfully",
-      data: borrowRecord,
+      data: data,
     });
-  } catch (error: any) {
-    res.status(5000).json({
+  } catch (error) {
+    res.status(500).json({
       success: false,
       message: "verification failed",
       error : error
     });
   }
+
 });
+
+
+// bookRoutes.post("/borrow/", async (req: Request, res: Response): Promise< void> => {
+//   try {
+//     const { book: bookId, quantity, dueDate } = req.body;
+
+//     if (typeof quantity !== "number" || quantity <= 0) {
+//        res.status(400).json({
+//         success: false,
+//         message: "Quantity must be a positive number.",
+//       });
+//     }
+
+//     const parsedDueDate = new Date(dueDate);
+//     if (isNaN(parsedDueDate.getTime())) {
+//        res.status(400).json({
+//         success: false,
+//         message: "Invalid dueDate format. Please provide a valid date string.",
+//       });
+//     }
+
+//     const book = await Book.findById(bookId);
+//     if (!book) {
+//        res.status(404).json({
+//         success: false,
+//         message: "Book not found.",
+//       });
+//     }
+
+//     if (book.copies < quantity) {
+//        res.status(409).json({
+//         success: false,
+//         message: "Not enough copies available for this book to fulfill the request.",
+//       });
+//     }
+
+//     book.copies -= quantity;
+//     book.available = book.copies > 0;
+//     await book.save();
+
+//     const borrowRecord = await Borrow.create({
+//       book: book._id,
+//       quantity,
+//       dueDate: parsedDueDate,
+//     });
+
+//     return res.status(201).json({
+//       success: true,
+//       message: "Book borrowed successfully",
+//       data: borrowRecord,
+//     });
+//   } catch (error) {
+//     console.error("Borrow error:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Verification failed",
+//       error,
+//     });
+//   }
+// });
+
+
 
 // borrow books summary
 
@@ -259,7 +384,7 @@ bookRoutes.get("/borrow/", async (req: Request, res: Response) => {
       message: "Borrowed books summary retrieved successfully",
       data: summary,
     });
-  } catch (error: any) {
+  } catch (error ) {
     res.status(500).json({
       success: false,
       message: "Failed to retrieve borrowed books summary.",

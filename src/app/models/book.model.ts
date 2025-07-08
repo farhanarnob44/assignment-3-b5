@@ -1,8 +1,8 @@
 import { Schema } from "mongoose";
 import { model } from "mongoose";
-import { IBook } from "../interface/book.interface";
+import { IBook, IBookMethods } from "../interface/book.interface";
 
-const bookSchema = new Schema<IBook>({
+const bookSchema = new Schema<IBook , IBookMethods>({
   title: { type: String, required: true, trim: true },
   author: { type : String, required: true , trim: true},
   genre: {type : String, required: true , trim: true, uppercase: true},
