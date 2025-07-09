@@ -41,4 +41,13 @@
 
 => npm run dev
 
+## Recorded video link 
+ => https://drive.google.com/file/d/11fUwc5u2H-ggYh8NF1jofVsqd9LVbwPV/view?usp=drivesdk
 
+## Github repository link
+
+=> https://github.com/farhanarnob44/assignment-3-b5
+
+## Vercel link 
+
+=> https://library-management-backend-phi-liard.vercel.app/
