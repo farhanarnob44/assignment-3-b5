@@ -5,7 +5,7 @@ export const bookRoutes = express.Router();
 
 // create a book
 
-bookRoutes.post("/books/create-book", async (req: Request, res: Response) => {
+bookRoutes.post("/books/", async (req: Request, res: Response) => {
   try {
     const body = req.body;
     const book = await Book.create(body);

@@ -24,6 +24,6 @@
   "dependencies": {
     "express": "^5.1.0",
     "lint": "^0.8.19",
-    "mongoose": "^8.16.2"
+    "mongoose": "^8.17.0"
   }
 }
