@@ -25,7 +25,11 @@
   "dependencies": {
     "express": "^5.1.0",
     "lint": "^0.8.19",
+<<<<<<< HEAD
     "mongoose": "^8.16.2",
     "nodemon": "^3.1.10"
+=======
+    "mongoose": "^8.17.0"
+>>>>>>> 0fa0b6171759ed278f5c8242ff746d7a0bc19684
   }
 }

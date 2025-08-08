@@ -5,7 +5,11 @@ export const bookRoutes = express.Router();
 
 // create a book
 
+<<<<<<< HEAD
 bookRoutes.post("/api/books", async (req: Request, res: Response) => {
+=======
+bookRoutes.post("/books/", async (req: Request, res: Response) => {
+>>>>>>> 0fa0b6171759ed278f5c8242ff746d7a0bc19684
   try {
     const body = req.body;
     const book = await Book.create(body);
