@@ -26,7 +26,7 @@ const jsonErrorHandler: ErrorRequestHandler = (
 app.use(jsonErrorHandler);
 
 
-app.use("/api", bookRoutes)
+app.use("/", bookRoutes)
 
 app.get('/', (_req: Request, res: Response) => {
     res.send('Welcome to new APP')

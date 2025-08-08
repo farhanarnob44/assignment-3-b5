@@ -5,7 +5,7 @@ export const bookRoutes = express.Router();
 
 // create a book
 
-bookRoutes.post("/books/create-book", async (req: Request, res: Response) => {
+bookRoutes.post("/api/books", async (req: Request, res: Response) => {
   try {
     const body = req.body;
     const book = await Book.create(body);
@@ -27,7 +27,7 @@ bookRoutes.post("/books/create-book", async (req: Request, res: Response) => {
 // get all books
 
 bookRoutes.get(
-  "/books",
+  "/api/books",
   async (req: Request, res: Response): Promise<void> => {
     try {
       const { genre, sortBy, sort, limit } = req.query;
@@ -72,7 +72,7 @@ bookRoutes.get(
 
 // get a single book
 
-bookRoutes.get("/books/:bookId", async (req: Request, res: Response) => {
+bookRoutes.get("/api/books/:bookId", async (req: Request, res: Response) => {
   try {
     const bookId = req.params.bookId;
     const book = await Book.findOne({ _id: bookId });
@@ -93,7 +93,7 @@ bookRoutes.get("/books/:bookId", async (req: Request, res: Response) => {
 
 // update a single book
 
-bookRoutes.put("/books/:bookId", async (req: Request, res: Response) => {
+bookRoutes.put("/api/books/:bookId", async (req: Request, res: Response) => {
   try {
     const updatedBody = req.body;
     const bookId = req.params.bookId;
@@ -119,7 +119,7 @@ bookRoutes.put("/books/:bookId", async (req: Request, res: Response) => {
 
 // delete a book
 
-bookRoutes.delete("/books/:bookId", async (req: Request, res: Response) => {
+bookRoutes.delete("/api/books/:bookId", async (req: Request, res: Response) => {
   try {
     const bookId = req.params.bookId;
     const deleteBook = await Book.findByIdAndDelete(bookId);
@@ -140,12 +140,44 @@ bookRoutes.delete("/books/:bookId", async (req: Request, res: Response) => {
 
 // borrow books
 
+// bookRoutes.post(
+//   "/api/borrow/",
+//   async (req: Request, res: Response): Promise<void> => {
+//     try {
+//       const { book, quantity, dueDate } = req.body;
+//       const foundBook = await Book.findById(book);
+//       if (!foundBook) {
+//         res.status(404).json({
+//           success: false,
+//           message: "Book not found!",
+//         });
+//         return;
+//       }
+//       // await foundBook.borrowBook(quantity);
+//       const data = await Borrow.create({ book, quantity, dueDate });
+
+//       res.status(201).json({
+//         success: true,
+//         message: "Book borrowed successfully",
+//         data: data,
+//       });
+//     } catch (error) {
+//       res.status(500).json({
+//         success: false,
+//         message: "verification failed",
+//         error: error,
+//       });
+//     }
+//   }
+// );
+
 bookRoutes.post(
-  "/borrow/",
+  "/api/borrow/",
   async (req: Request, res: Response): Promise<void> => {
     try {
       const { book, quantity, dueDate } = req.body;
       const foundBook = await Book.findById(book);
+
       if (!foundBook) {
         res.status(404).json({
           success: false,
@@ -153,7 +185,26 @@ bookRoutes.post(
         });
         return;
       }
-      // await foundBook.borrowBook(quantity);
+
+      // 1. Availability verification
+      if (foundBook.copies < quantity) {
+        res.status(400).json({
+          success: false,
+          message: "Not enough copies available to borrow."
+        });
+        return;
+      }
+
+      // 2. Copies deduction logic
+      foundBook.copies -= quantity;
+
+      // 3. Set available=false when copies=0
+      if (foundBook.copies === 0) {
+        foundBook.available = false;
+      }
+      
+      await foundBook.save();
+
       const data = await Borrow.create({ book, quantity, dueDate });
 
       res.status(201).json({
@@ -164,7 +215,7 @@ bookRoutes.post(
     } catch (error) {
       res.status(500).json({
         success: false,
-        message: "verification failed",
+        message: "Verification failed",
         error: error,
       });
     }
@@ -173,7 +224,7 @@ bookRoutes.post(
 
 // borrow books summary
 
-bookRoutes.get("/borrow/", async (req: Request, res: Response) => {
+bookRoutes.get("/api/borrow/", async (req: Request, res: Response) => {
   try {
     const summary = await Borrow.aggregate([
       {
