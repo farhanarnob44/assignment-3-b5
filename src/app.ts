@@ -1,8 +1,14 @@
+const cors = require('cors'); 
 import express, {Application, ErrorRequestHandler, NextFunction, Request, Response} from 'express';
 import { bookRoutes } from './app/controllers/book.controller';
 
 
+
+
 const app: Application = express();
+
+app.use(cors({origin : "http://localhost:5173"}))
+
 app.use(express.json())
 
 const jsonErrorHandler: ErrorRequestHandler = (
@@ -24,6 +30,8 @@ const jsonErrorHandler: ErrorRequestHandler = (
 };
 
 app.use(jsonErrorHandler);
+
+
 
 
 app.use("/", bookRoutes)

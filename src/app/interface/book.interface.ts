@@ -3,9 +3,9 @@ export interface IBook {
   author: string,
   genre: string,
   isbn: string,
-  description: string,
+  description: { type: String, required: true },
   copies: number,
-  available: boolean,
+  available: Boolean,
 }
 export interface IBookMethods {
   borrowBook: (quantity: number) => Promise<void>;
