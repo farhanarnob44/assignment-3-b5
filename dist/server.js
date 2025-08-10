@@ -9,10 +9,11 @@ let server;
 const PORT = 5000;
 async function main() {
     try {
-        await mongoose_1.default.connect('mongodb+srv://mongoDB:mongoDB@cluster0.cpxrc.mongodb.net/library-app?retryWrites=true&w=majority&appName=Cluster0');
+        await mongoose_1.default.connect("mongodb+srv://mongoDB:mongoDB@cluster0.cpxrc.mongodb.net/library-app?retryWrites=true&w=majority&appName=Cluster0");
         console.log("Connected to mongoDB");
         server = app_1.default.listen(PORT, () => {
             console.log(`App is listening on the port : ${PORT}`);
+            // In server.js or app.ts, after mongoose.connect()
         });
     }
     catch (error) {

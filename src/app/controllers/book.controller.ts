@@ -24,100 +24,12 @@ bookRoutes.post("/api/books", async (req: Request, res: Response) => {
   }
 });
 
-// bookRoutes.post("/api/books", async (req: Request, res: Response) => {
-//   try {
-//     const body = req.body;
-//     console.log("Received body:", body); 
-//     console.log("Attempting to create book with Mongoose..."); // <-- NEW LOG
-
-//     const book = await Book.create(body); 
-
-//     console.log("Book created successfully by Mongoose (server-side):", book); // <-- NEW LOG
-//     res.status(201).json({
-//       success: true,
-//       message: "Books created successfully",
-//       book,
-//     });
-//   } catch (error: any) {
-//     // Keep this detailed error logging from previous suggestions
-//     console.error("--- SERVER-SIDE ERROR DURING BOOK CREATION ---");
-//     console.error("Error type:", error.name);
-//     console.error("Error message:", error.message);
-
-//     if (error.errors) {
-//       console.error("Validation details:");
-//       for (const key in error.errors) {
-//         if (error.errors.hasOwnProperty(key)) {
-//           const validationError = error.errors[key];
-//           console.error(`  Field: ${validationError.path}, Kind: ${validationError.kind}, Value: ${validationError.value}, Message: ${validationError.message}`);
-//         }
-//       }
-//     } else {
-//       console.error("Other error details (full object):", error);
-//     }
-//     console.error("---------------------------------------------");
-
-//     res.status(400).json({
-//       message: error.message || "Validation failed", // Use error.message for more detail
-//       success: false,
-//       error: error.message || "An unknown server error occurred.",
-//       details: error.errors || null,
-//     });
-//   }
-// });
-
-// get all books
-
-// bookRoutes.get(
-//   "/api/books",
-//   async (req: Request, res: Response): Promise<void> => {
-//     try {
-//       const { genre, sortBy, sort, limit } = req.query;
-
-//       const findQuery: { [key: string]: any } = {};
-//       const sortOptions: { [key: string]: 1 | -1 } = {};
-//       let limitValue = 10;
-
-//       if (typeof genre === "string") {
-//         findQuery.genre = genre.toUpperCase();
-//       }
-
-//       const actualSortBy = typeof sortBy === "string" ? sortBy : "createdAt";
-//       sortOptions[actualSortBy] =
-//         sort === "desc" || sort === "descending" ? -1 : 1;
-
-//       if (typeof limit === "string") {
-//         const parsedLimit = parseInt(limit, 10);
-//         if (!isNaN(parsedLimit) && parsedLimit > 0) {
-//           limitValue = parsedLimit;
-//         }
-//       }
-
-//       const books = await Book.find(findQuery)
-//         .sort(sortOptions)
-//         .limit(limitValue);
-
-//       res.status(200).json({
-//         success: true,
-//         message: "Books fetched successfully",
-//         books,
-//       });
-//     } catch (error) {
-//       res.status(400).json({
-//         success: false,
-//         message: "Validation failed",
-//         error,
-//       });
-//     }
-//   }
-// );
 
 
 
+// get a all books
 
-// get a single book
 
-// src/app/controllers/book.controller.ts (or wherever bookRoutes is defined)
 
 bookRoutes.get(
   "/api/books",
@@ -127,7 +39,7 @@ bookRoutes.get(
 
       const findQuery: { [key: string]: any } = {};
       const sortOptions: { [key: string]: 1 | -1 } = {};
-      // Removed: let limitValue = 10;
+
 
       if (typeof genre === "string") {
         findQuery.genre = genre.toUpperCase();
@@ -137,10 +49,10 @@ bookRoutes.get(
       sortOptions[actualSortBy] =
         sort === "desc" || sort === "descending" ? -1 : 1;
 
-      // Removed the 'limit' parsing block
+
 
       const books = await Book.find(findQuery)
-        .sort(sortOptions); // Removed .limit(limitValue)
+        .sort(sortOptions); 
 
       res.status(200).json({
         success: true,
@@ -157,7 +69,7 @@ bookRoutes.get(
   }
 );
 
-
+// get a single book 
 
 
 bookRoutes.get("/api/books/:bookId", async (req: Request, res: Response) => {
@@ -228,36 +140,7 @@ bookRoutes.delete("/api/books/:bookId", async (req: Request, res: Response) => {
 
 // borrow books
 
-// bookRoutes.post(
-//   "/api/borrow/",
-//   async (req: Request, res: Response): Promise<void> => {
-//     try {
-//       const { book, quantity, dueDate } = req.body;
-//       const foundBook = await Book.findById(book);
-//       if (!foundBook) {
-//         res.status(404).json({
-//           success: false,
-//           message: "Book not found!",
-//         });
-//         return;
-//       }
-//       // await foundBook.borrowBook(quantity);
-//       const data = await Borrow.create({ book, quantity, dueDate });
 
-//       res.status(201).json({
-//         success: true,
-//         message: "Book borrowed successfully",
-//         data: data,
-//       });
-//     } catch (error) {
-//       res.status(500).json({
-//         success: false,
-//         message: "verification failed",
-//         error: error,
-//       });
-//     }
-//   }
-// );
 
 bookRoutes.post(
   "/api/borrow/",
@@ -274,7 +157,7 @@ bookRoutes.post(
         return;
       }
 
-      // 1. Availability verification
+
       if (foundBook.copies < quantity) {
         res.status(400).json({
           success: false,
@@ -283,10 +166,8 @@ bookRoutes.post(
         return;
       }
 
-      // 2. Copies deduction logic
       foundBook.copies -= quantity;
 
-      // 3. Set available=false when copies=0
       if (foundBook.copies === 0) {
         foundBook.available = false;
       }

@@ -1,4 +1,4 @@
-const cors = require('cors'); 
+import cors from 'cors';
 import express, {Application, ErrorRequestHandler, NextFunction, Request, Response} from 'express';
 import { bookRoutes } from './app/controllers/book.controller';
 
@@ -7,7 +7,11 @@ import { bookRoutes } from './app/controllers/book.controller';
 
 const app: Application = express();
 
-app.use(cors({origin : "http://localhost:5173"}))
+app.use(
+  cors({
+    origin: ['http://localhost:5173', 'https://library-frontend-umber-five.vercel.app']
+   })
+);
 
 app.use(express.json())
 
